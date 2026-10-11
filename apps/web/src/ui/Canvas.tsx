@@ -12,7 +12,7 @@ import {
   type FitViewOptions,
   type NodeChange,
 } from '@xyflow/react';
-import type { LayoutEngine, NodeKind } from '@trazo/core';
+import type { NodeKind } from '@trazo/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectActiveDiagram, useDiagramStore } from '../state/diagramStore';
 import { FlowEdge } from './FlowEdge';
@@ -20,6 +20,7 @@ import { FlowNode } from './FlowNode';
 import { MindEdge } from './MindEdge';
 import { MindNode } from './MindNode';
 import { mergeEdges, mergeNodes, toEndpoints, type TrazoEdge, type TrazoNode } from './flowAdapter';
+import { useServices } from './services';
 import type { Theme } from './useTheme';
 
 const FIT_OPTIONS: FitViewOptions = {
@@ -34,13 +35,10 @@ const KINDS: { kind: NodeKind; label: string }[] = [
   { kind: 'end', label: 'Fin' },
 ];
 
-interface CanvasProps {
-  theme: Theme;
-  layoutEngine: LayoutEngine;
-}
-
-export function Canvas({ theme, layoutEngine }: CanvasProps) {
+export function Canvas({ theme }: { theme: Theme }) {
+  const { layoutEngine } = useServices();
   const diagram = useDiagramStore(selectActiveDiagram);
+  const documentId = useDiagramStore((state) => state.documentId);
   const autoPositions = useDiagramStore((state) => state.autoPositions);
   const selectedNodeIds = useDiagramStore((state) => state.selectedNodeIds);
   const actions = useDiagramStore.getState();
@@ -60,7 +58,7 @@ export function Canvas({ theme, layoutEngine }: CanvasProps) {
 
   useEffect(() => {
     fitPending.current = true;
-  }, [diagram.type]);
+  }, [documentId]);
 
   useEffect(() => {
     let cancelled = false;

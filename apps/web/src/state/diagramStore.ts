@@ -5,8 +5,9 @@ import {
   clearPositions,
   computeSides,
   connect,
+  createFlowchart,
+  createMindmap,
   exampleFlowchart,
-  exampleMindmap,
   moveMindNode,
   moveNode,
   reconnectEdge,
@@ -14,6 +15,7 @@ import {
   removeEdge,
   removeNode,
   renameMindNode,
+  setTitle,
   updateEdgeLabel,
   updateNode,
   type Diagram,
@@ -33,16 +35,38 @@ export const DEFAULT_LABELS: Record<NodeKind, string> = {
 };
 
 const DEFAULT_MIND_LABEL = 'Idea';
+const UNTITLED = '';
 
-type DiagramType = Diagram['type'];
+export type SaveStatus = 'saved' | 'saving' | 'error';
+
+export interface Notice {
+  kind: 'error' | 'info';
+  title: string;
+  details: string[];
+}
+
+export interface OpenDocument {
+  id: string;
+  diagram: Diagram;
+  token?: unknown;
+}
 
 interface DiagramState {
-  diagrams: { flowchart: FlowchartDiagram; mindmap: MindmapDiagram };
-  active: DiagramType;
+  documentId: string;
+  diagram: Diagram;
+  fileToken: unknown;
+  saveStatus: SaveStatus;
+  notice: Notice | null;
   autoPositions: Record<string, Position>;
   selectedNodeIds: string[];
   editingNodeId: string | null;
-  setActive: (type: DiagramType) => void;
+  loadDocument: (document: OpenDocument) => void;
+  newDocument: (type: Diagram['type']) => void;
+  renameDiagram: (title: string) => void;
+  setFileToken: (token: unknown) => void;
+  setSaveStatus: (status: SaveStatus) => void;
+  showNotice: (notice: Notice) => void;
+  dismissNotice: () => void;
   setAutoPositions: (positions: Record<string, Position>) => void;
   rearrange: () => void;
   addFlowNode: (kind: NodeKind, position: Position) => void;
@@ -61,26 +85,26 @@ interface DiagramState {
   loadExample: () => void;
 }
 
-function newId(prefix: string): string {
+export function newId(prefix: string): string {
   return `${prefix}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
 export function selectActiveDiagram(state: DiagramState): Diagram {
-  return state.diagrams[state.active];
+  return state.diagram;
 }
 
 function withFlowchart(
   state: DiagramState,
   change: (diagram: FlowchartDiagram) => FlowchartDiagram,
 ): Partial<DiagramState> {
-  return { diagrams: { ...state.diagrams, flowchart: change(state.diagrams.flowchart) } };
+  return state.diagram.type === 'flowchart' ? { diagram: change(state.diagram) } : {};
 }
 
 function withMindmap(
   state: DiagramState,
   change: (diagram: MindmapDiagram) => MindmapDiagram,
 ): Partial<DiagramState> {
-  return { diagrams: { ...state.diagrams, mindmap: change(state.diagrams.mindmap) } };
+  return state.diagram.type === 'mindmap' ? { diagram: change(state.diagram) } : {};
 }
 
 const CHILD_DISTANCE = 300;
@@ -108,28 +132,50 @@ function hasNode(diagram: Diagram, nodeId: string): boolean {
   return diagram.nodes.some((node) => node.id === nodeId);
 }
 
-function survivingSelection(state: DiagramState, diagrams: DiagramState['diagrams']): string[] {
-  const diagram = diagrams[state.active];
-  return state.selectedNodeIds.filter((nodeId) => hasNode(diagram, nodeId));
-}
-
 export const useDiagramStore = create<DiagramState>((set) => ({
-  diagrams: { flowchart: exampleFlowchart, mindmap: exampleMindmap },
-  active: 'flowchart',
+  documentId: newId('d'),
+  diagram: exampleFlowchart,
+  fileToken: undefined,
+  saveStatus: 'saved',
+  notice: null,
   autoPositions: {},
   selectedNodeIds: [],
   editingNodeId: null,
 
-  setActive: (type) => set({ active: type, selectedNodeIds: [], editingNodeId: null }),
+  loadDocument: ({ id, diagram, token }) =>
+    set({
+      documentId: id,
+      diagram,
+      fileToken: token,
+      saveStatus: 'saved',
+      autoPositions: {},
+      selectedNodeIds: [],
+      editingNodeId: null,
+    }),
+
+  newDocument: (type) =>
+    set({
+      documentId: newId('d'),
+      diagram:
+        type === 'flowchart'
+          ? createFlowchart(UNTITLED)
+          : createMindmap(UNTITLED, newId('m'), 'Idea central'),
+      fileToken: undefined,
+      saveStatus: 'saved',
+      autoPositions: {},
+      selectedNodeIds: [],
+      editingNodeId: null,
+    }),
+
+  renameDiagram: (title) => set((state) => ({ diagram: setTitle(state.diagram, title) })),
+  setFileToken: (token) => set({ fileToken: token }),
+  setSaveStatus: (status) => set({ saveStatus: status }),
+  showNotice: (notice) => set({ notice }),
+  dismissNotice: () => set({ notice: null }),
 
   setAutoPositions: (positions) => set({ autoPositions: positions }),
 
-  rearrange: () =>
-    set((state) =>
-      state.active === 'flowchart'
-        ? withFlowchart(state, clearPositions)
-        : withMindmap(state, clearPositions),
-    ),
+  rearrange: () => set((state) => ({ diagram: clearPositions(state.diagram) })),
 
   addFlowNode: (kind, position) => {
     const id = newId('n');
@@ -144,40 +190,39 @@ export const useDiagramStore = create<DiagramState>((set) => ({
 
   moveNodeTo: (nodeId, position) =>
     set((state) => {
-      if (!hasNode(selectActiveDiagram(state), nodeId)) {
+      if (!hasNode(state.diagram, nodeId)) {
         return state;
       }
-      return state.active === 'flowchart'
+      return state.diagram.type === 'flowchart'
         ? withFlowchart(state, (diagram) => moveNode(diagram, nodeId, position))
         : withMindmap(state, (diagram) => moveMindNode(diagram, nodeId, position));
     }),
 
   renameNode: (nodeId, label) =>
     set((state) =>
-      state.active === 'flowchart'
+      state.diagram.type === 'flowchart'
         ? withFlowchart(state, (diagram) => updateNode(diagram, nodeId, { label }))
         : withMindmap(state, (diagram) => renameMindNode(diagram, nodeId, label)),
     ),
 
   removeNodes: (nodeIds) =>
     set((state) => {
-      const diagrams =
-        state.active === 'flowchart'
+      const changed =
+        state.diagram.type === 'flowchart'
           ? withFlowchart(state, (current) =>
-              nodeIds
-                .filter((nodeId) => hasNode(current, nodeId))
-                .reduce(removeNode, current),
-            ).diagrams
+              nodeIds.filter((nodeId) => hasNode(current, nodeId)).reduce(removeNode, current),
+            )
           : withMindmap(state, (current) =>
               nodeIds.reduce((acc, nodeId) => {
                 const node = acc.nodes.find((candidate) => candidate.id === nodeId);
                 return node && node.parent !== null ? removeBranch(acc, nodeId) : acc;
               }, current),
-            ).diagrams;
-      if (!diagrams) {
-        return state;
-      }
-      return { diagrams, selectedNodeIds: survivingSelection(state, diagrams) };
+            );
+      const diagram = changed.diagram ?? state.diagram;
+      return {
+        ...changed,
+        selectedNodeIds: state.selectedNodeIds.filter((nodeId) => hasNode(diagram, nodeId)),
+      };
     }),
 
   connectNodes: (endpoints) =>
@@ -199,9 +244,12 @@ export const useDiagramStore = create<DiagramState>((set) => ({
   addChildOf: (parentId) => {
     const id = newId('m');
     set((state) => {
-      const mindmap = addChild(state.diagrams.mindmap, parentId, { id, label: DEFAULT_MIND_LABEL });
+      if (state.diagram.type !== 'mindmap') {
+        return state;
+      }
+      const mindmap = addChild(state.diagram, parentId, { id, label: DEFAULT_MIND_LABEL });
       return {
-        diagrams: { ...state.diagrams, mindmap },
+        diagram: mindmap,
         autoPositions: withProvisional(state, mindmap, id, parentId, 'child'),
         selectedNodeIds: [id],
         editingNodeId: id,
@@ -212,17 +260,20 @@ export const useDiagramStore = create<DiagramState>((set) => ({
   addSiblingOf: (nodeId) => {
     const id = newId('m');
     set((state) => {
-      const reference = state.diagrams.mindmap.nodes.find((node) => node.id === nodeId);
+      if (state.diagram.type !== 'mindmap') {
+        return state;
+      }
+      const reference = state.diagram.nodes.find((node) => node.id === nodeId);
       if (!reference) {
         return state;
       }
       const isRoot = reference.parent === null;
       const created = { id, label: DEFAULT_MIND_LABEL };
       const mindmap = isRoot
-        ? addChild(state.diagrams.mindmap, nodeId, created)
-        : addSibling(state.diagrams.mindmap, nodeId, created);
+        ? addChild(state.diagram, nodeId, created)
+        : addSibling(state.diagram, nodeId, created);
       return {
-        diagrams: { ...state.diagrams, mindmap },
+        diagram: mindmap,
         autoPositions: withProvisional(state, mindmap, id, nodeId, isRoot ? 'child' : 'sibling'),
         selectedNodeIds: [id],
         editingNodeId: id,
@@ -240,9 +291,5 @@ export const useDiagramStore = create<DiagramState>((set) => ({
   stopEditing: () => set({ editingNodeId: null }),
 
   loadExample: () =>
-    set((state) => ({
-      diagrams: { ...state.diagrams, flowchart: exampleFlowchart },
-      selectedNodeIds: [],
-      editingNodeId: null,
-    })),
+    set({ diagram: exampleFlowchart, selectedNodeIds: [], editingNodeId: null, autoPositions: {} }),
 }));
