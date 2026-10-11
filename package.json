@@ -1,0 +1,11 @@
+{
+  "name": "trazo",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev": "npm run dev -w @trazo/web",
+    "build": "npm run build -w @trazo/web",
+    "test": "npm run test -w @trazo/core",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}
