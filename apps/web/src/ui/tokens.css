@@ -1,0 +1,49 @@
+:root {
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'Geist', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+
+  --space-related: 0.5rem;
+  --space-group: 1.25rem;
+  --space-block: 3rem;
+
+  --radius-node: 0.9rem;
+  --radius-pill: 999px;
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color-scheme: dark;
+  --color-bg: oklch(0.16 0.035 285);
+  --color-surface: oklch(0.22 0.045 285);
+  --color-ink: oklch(0.96 0.012 285);
+  --color-muted: oklch(0.7 0.035 285);
+  --color-line: oklch(0.96 0.012 285 / 0.1);
+  --color-primary: oklch(0.7 0.19 285);
+  --color-on-primary: oklch(0.14 0.03 285);
+  --color-secondary: oklch(0.83 0.12 205);
+  --color-accent: oklch(0.82 0.15 78);
+  --color-hot: oklch(0.72 0.21 350);
+  --edge-color: oklch(0.72 0.05 285);
+  --grid-dot: oklch(0.96 0.012 285 / 0.13);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --color-bg: oklch(0.975 0.012 285);
+  --color-surface: oklch(1 0 0);
+  --color-ink: oklch(0.2 0.045 285);
+  --color-muted: oklch(0.5 0.045 285);
+  --color-line: oklch(0.2 0.045 285 / 0.12);
+  --color-primary: oklch(0.52 0.24 285);
+  --color-on-primary: oklch(0.99 0 0);
+  --color-secondary: oklch(0.62 0.12 205);
+  --color-accent: oklch(0.7 0.16 65);
+  --color-hot: oklch(0.6 0.23 350);
+  --edge-color: oklch(0.5 0.06 285);
+  --grid-dot: oklch(0.2 0.045 285 / 0.16);
+}
+
+[data-kind='start'] { --kind: var(--color-secondary); }
+[data-kind='process'] { --kind: var(--color-primary); }
+[data-kind='decision'] { --kind: var(--color-accent); }
+[data-kind='end'] { --kind: var(--color-hot); }
