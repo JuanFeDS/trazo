@@ -47,3 +47,9 @@
 [data-kind='process'] { --kind: var(--color-primary); }
 [data-kind='decision'] { --kind: var(--color-accent); }
 [data-kind='end'] { --kind: var(--color-hot); }
+
+[data-branch='root'] { --kind: var(--color-primary); }
+[data-branch='0'] { --kind: var(--color-secondary); }
+[data-branch='1'] { --kind: var(--color-accent); }
+[data-branch='2'] { --kind: var(--color-hot); }
+[data-branch='3'] { --kind: var(--color-primary); }
