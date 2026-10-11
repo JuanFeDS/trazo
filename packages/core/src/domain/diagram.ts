@@ -60,6 +60,10 @@ export function createMindmap(title: string, rootId: string, rootLabel: string):
   };
 }
 
+export function setTitle<T extends Diagram>(diagram: T, title: string): T {
+  return { ...diagram, title };
+}
+
 export function clearPositions<T extends Diagram>(diagram: T): T {
   const nodes = diagram.nodes.map(({ position: _position, ...rest }) => rest);
   return { ...diagram, nodes } as T;
