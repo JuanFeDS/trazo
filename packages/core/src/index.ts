@@ -1,3 +1,5 @@
 export * from './domain/diagram';
 export * from './domain/operations';
-export { exampleDiagram } from './domain/example';
+export * from './domain/mindmap';
+export { exampleFlowchart, exampleMindmap } from './domain/example';
+export type { LayoutEngine } from './ports/layout';

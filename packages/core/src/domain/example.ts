@@ -1,6 +1,6 @@
-import type { Diagram } from './diagram';
+import type { FlowchartDiagram, MindmapDiagram } from './diagram';
 
-export const exampleDiagram: Diagram = {
+export const exampleFlowchart: FlowchartDiagram = {
   version: 1,
   type: 'flowchart',
   title: 'Inicio de sesión',
@@ -19,5 +19,24 @@ export const exampleDiagram: Diagram = {
     { id: 'e4', from: 'valid', to: 'error', label: 'No' },
     { id: 'e5', from: 'home', to: 'end' },
     { id: 'e6', from: 'error', to: 'form' },
+  ],
+};
+
+export const exampleMindmap: MindmapDiagram = {
+  version: 1,
+  type: 'mindmap',
+  title: 'Plan de portafolio',
+  nodes: [
+    { id: 'root', label: 'Portafolio', parent: null },
+    { id: 'content', label: 'Contenido', parent: 'root' },
+    { id: 'projects', label: 'Proyectos destacados', parent: 'content' },
+    { id: 'about', label: 'Sobre mí', parent: 'content' },
+    { id: 'design', label: 'Diseño', parent: 'root' },
+    { id: 'palette', label: 'Paleta y tipografía', parent: 'design' },
+    { id: 'dark', label: 'Tema oscuro', parent: 'design' },
+    { id: 'launch', label: 'Lanzamiento', parent: 'root' },
+    { id: 'domain', label: 'Dominio y hosting', parent: 'launch' },
+    { id: 'seo', label: 'SEO básico', parent: 'launch' },
+    { id: 'share', label: 'Difusión', parent: 'root' },
   ],
 };
