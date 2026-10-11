@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createDiagram } from '../../src/domain/diagram';
+import { createFlowchart } from '../../src/domain/diagram';
 import {
   DomainError,
   addNode,
@@ -13,13 +13,13 @@ import {
 } from '../../src/domain/operations';
 
 const base = addNode(
-  addNode(createDiagram('Prueba'), { id: 'a', kind: 'start', label: 'A' }),
+  addNode(createFlowchart('Prueba'), { id: 'a', kind: 'start', label: 'A' }),
   { id: 'b', kind: 'process', label: 'B' },
 );
 
 describe('addNode', () => {
   it('agrega el nodo sin mutar el diagrama original', () => {
-    const empty = createDiagram('Vacío');
+    const empty = createFlowchart('Vacío');
     const next = addNode(empty, { id: 'a', kind: 'start', label: 'A' });
     expect(next.nodes).toHaveLength(1);
     expect(empty.nodes).toHaveLength(0);

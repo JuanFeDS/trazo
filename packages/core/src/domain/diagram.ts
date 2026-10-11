@@ -5,10 +5,17 @@ export interface Position {
   y: number;
 }
 
-export interface DiagramNode {
+export interface FlowNode {
   id: string;
   label: string;
   kind: NodeKind;
+  position?: Position;
+}
+
+export interface MindNode {
+  id: string;
+  label: string;
+  parent: string | null;
   position?: Position;
 }
 
@@ -23,14 +30,37 @@ export interface DiagramEdge {
   label?: string;
 }
 
-export interface Diagram {
+export interface FlowchartDiagram {
   version: 1;
   type: 'flowchart';
   title: string;
-  nodes: readonly DiagramNode[];
+  nodes: readonly FlowNode[];
   edges: readonly DiagramEdge[];
 }
 
-export function createDiagram(title: string): Diagram {
+export interface MindmapDiagram {
+  version: 1;
+  type: 'mindmap';
+  title: string;
+  nodes: readonly MindNode[];
+}
+
+export type Diagram = FlowchartDiagram | MindmapDiagram;
+
+export function createFlowchart(title: string): FlowchartDiagram {
   return { version: 1, type: 'flowchart', title, nodes: [], edges: [] };
+}
+
+export function createMindmap(title: string, rootId: string, rootLabel: string): MindmapDiagram {
+  return {
+    version: 1,
+    type: 'mindmap',
+    title,
+    nodes: [{ id: rootId, label: rootLabel, parent: null }],
+  };
+}
+
+export function clearPositions<T extends Diagram>(diagram: T): T {
+  const nodes = diagram.nodes.map(({ position: _position, ...rest }) => rest);
+  return { ...diagram, nodes } as T;
 }

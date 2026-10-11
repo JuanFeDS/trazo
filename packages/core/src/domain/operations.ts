@@ -1,8 +1,8 @@
-import type { Diagram, DiagramEdge, DiagramNode, Position } from './diagram';
+import type { FlowchartDiagram, DiagramEdge, FlowNode, Position } from './diagram';
 
 export class DomainError extends Error {}
 
-function requireNode(diagram: Diagram, nodeId: string): DiagramNode {
+function requireNode(diagram: FlowchartDiagram, nodeId: string): FlowNode {
   const node = diagram.nodes.find((candidate) => candidate.id === nodeId);
   if (!node) {
     throw new DomainError(`No existe el nodo "${nodeId}"`);
@@ -10,7 +10,7 @@ function requireNode(diagram: Diagram, nodeId: string): DiagramNode {
   return node;
 }
 
-export function addNode(diagram: Diagram, node: DiagramNode): Diagram {
+export function addNode(diagram: FlowchartDiagram, node: FlowNode): FlowchartDiagram {
   if (diagram.nodes.some((candidate) => candidate.id === node.id)) {
     throw new DomainError(`Ya existe el nodo "${node.id}"`);
   }
@@ -18,10 +18,10 @@ export function addNode(diagram: Diagram, node: DiagramNode): Diagram {
 }
 
 export function updateNode(
-  diagram: Diagram,
+  diagram: FlowchartDiagram,
   nodeId: string,
-  changes: Partial<Pick<DiagramNode, 'label' | 'kind'>>,
-): Diagram {
+  changes: Partial<Pick<FlowNode, 'label' | 'kind'>>,
+): FlowchartDiagram {
   requireNode(diagram, nodeId);
   return {
     ...diagram,
@@ -29,7 +29,7 @@ export function updateNode(
   };
 }
 
-export function moveNode(diagram: Diagram, nodeId: string, position: Position): Diagram {
+export function moveNode(diagram: FlowchartDiagram, nodeId: string, position: Position): FlowchartDiagram {
   requireNode(diagram, nodeId);
   return {
     ...diagram,
@@ -37,7 +37,7 @@ export function moveNode(diagram: Diagram, nodeId: string, position: Position): 
   };
 }
 
-export function removeNode(diagram: Diagram, nodeId: string): Diagram {
+export function removeNode(diagram: FlowchartDiagram, nodeId: string): FlowchartDiagram {
   requireNode(diagram, nodeId);
   return {
     ...diagram,
@@ -46,7 +46,7 @@ export function removeNode(diagram: Diagram, nodeId: string): Diagram {
   };
 }
 
-export function connect(diagram: Diagram, edge: DiagramEdge): Diagram {
+export function connect(diagram: FlowchartDiagram, edge: DiagramEdge): FlowchartDiagram {
   requireNode(diagram, edge.from);
   requireNode(diagram, edge.to);
   const isDuplicate = diagram.edges.some(
@@ -61,7 +61,7 @@ export function connect(diagram: Diagram, edge: DiagramEdge): Diagram {
 
 export type EdgeEndpoints = Pick<DiagramEdge, 'from' | 'to' | 'fromSide' | 'toSide'>;
 
-export function reconnectEdge(diagram: Diagram, edgeId: string, endpoints: EdgeEndpoints): Diagram {
+export function reconnectEdge(diagram: FlowchartDiagram, edgeId: string, endpoints: EdgeEndpoints): FlowchartDiagram {
   requireNode(diagram, endpoints.from);
   requireNode(diagram, endpoints.to);
   if (!diagram.edges.some((edge) => edge.id === edgeId)) {
@@ -85,7 +85,7 @@ export function reconnectEdge(diagram: Diagram, edgeId: string, endpoints: EdgeE
   };
 }
 
-export function updateEdgeLabel(diagram: Diagram, edgeId: string, label: string): Diagram {
+export function updateEdgeLabel(diagram: FlowchartDiagram, edgeId: string, label: string): FlowchartDiagram {
   if (!diagram.edges.some((edge) => edge.id === edgeId)) {
     throw new DomainError(`No existe la conexión "${edgeId}"`);
   }
@@ -101,6 +101,6 @@ export function updateEdgeLabel(diagram: Diagram, edgeId: string, label: string)
   };
 }
 
-export function removeEdge(diagram: Diagram, edgeId: string): Diagram {
+export function removeEdge(diagram: FlowchartDiagram, edgeId: string): FlowchartDiagram {
   return { ...diagram, edges: diagram.edges.filter((edge) => edge.id !== edgeId) };
 }
