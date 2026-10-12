@@ -48,8 +48,11 @@
 [data-kind='decision'] { --kind: var(--color-accent); }
 [data-kind='end'] { --kind: var(--color-hot); }
 
-[data-branch='root'] { --kind: var(--color-primary); }
-[data-branch='0'] { --kind: var(--color-secondary); }
-[data-branch='1'] { --kind: var(--color-accent); }
-[data-branch='2'] { --kind: var(--color-hot); }
-[data-branch='3'] { --kind: var(--color-primary); }
+/* --on-kind es el texto legible sobre el color sólido de la rama. */
+[data-branch='root'] { --kind: var(--color-primary); --on-kind: var(--color-on-primary); }
+[data-branch='0'] { --kind: var(--color-secondary); --on-kind: oklch(0.16 0.035 285); }
+[data-branch='1'] { --kind: var(--color-accent); --on-kind: oklch(0.16 0.035 285); }
+[data-branch='2'] { --kind: var(--color-hot); --on-kind: oklch(0.16 0.035 285); }
+[data-branch='3'] { --kind: var(--color-primary); --on-kind: oklch(0.16 0.035 285); }
+
+:root[data-theme='light'] [data-branch='3'] { --on-kind: oklch(0.99 0 0); }

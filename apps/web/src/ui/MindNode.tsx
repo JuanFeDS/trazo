@@ -12,7 +12,7 @@ export function MindNode({ id, data, selected }: NodeProps<TrazoNode>) {
     <div
       className="tz-mind"
       data-branch={data.branch}
-      data-depth={Math.min(data.depth ?? 0, 2)}
+      data-depth={Math.min(data.depth ?? 0, 3)}
       data-selected={selected}
       onDoubleClick={() => startEditing(id)}
     >
