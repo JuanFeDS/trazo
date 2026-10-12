@@ -15,6 +15,7 @@ import {
 import type { NodeKind } from '@trazo/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectActiveDiagram, useDiagramStore } from '../state/diagramStore';
+import { EdgeSidesBar } from './EdgeSidesBar';
 import { FlowEdge } from './FlowEdge';
 import { FlowNode } from './FlowNode';
 import { MindEdge } from './MindEdge';
@@ -45,6 +46,7 @@ export function Canvas({ theme }: { theme: Theme }) {
   const { screenToFlowPosition, fitView } = useReactFlow();
   const [nodes, setNodes] = useState<TrazoNode[]>([]);
   const [edges, setEdges] = useState<TrazoEdge[]>([]);
+  const [connecting, setConnecting] = useState(false);
   const fitPending = useRef(true);
   const isMindmap = diagram.type === 'mindmap';
 
@@ -166,9 +168,10 @@ export function Canvas({ theme }: { theme: Theme }) {
   };
 
   const selectedId = selectedNodeIds.at(-1);
+  const selectedEdge = edges.find((edge) => edge.selected);
 
   return (
-    <div className="tz-canvas">
+    <div className="tz-canvas" data-connecting={connecting}>
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -178,7 +181,12 @@ export function Canvas({ theme }: { theme: Theme }) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onReconnect={onReconnect}
-        reconnectRadius={7}
+        reconnectRadius={10}
+        connectionRadius={80}
+        onConnectStart={() => setConnecting(true)}
+        onConnectEnd={() => setConnecting(false)}
+        onReconnectStart={() => setConnecting(true)}
+        onReconnectEnd={() => setConnecting(false)}
         nodesConnectable={!isMindmap}
         edgesReconnectable={!isMindmap}
         connectionMode={ConnectionMode.Loose}
@@ -207,6 +215,8 @@ export function Canvas({ theme }: { theme: Theme }) {
           </button>
         </div>
       )}
+
+      {!isMindmap && selectedEdge && <EdgeSidesBar edge={selectedEdge} />}
 
       <div className="tz-palette" role="toolbar" aria-label={isMindmap ? 'Editar mapa mental' : 'Agregar nodos'}>
         {isMindmap ? (

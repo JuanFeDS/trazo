@@ -139,12 +139,34 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .react-flow__edge.selected .tz-edge, .tz-edge[data-selected='true'] { stroke: var(--color-primary); stroke-width: 2.8; }
 .react-flow__arrowhead polyline, .react-flow__arrowhead path { stroke-linejoin: round; }
 .react-flow__edgeupdater {
-  fill: var(--color-primary); stroke: var(--color-bg); stroke-width: 2; cursor: grab; opacity: 0;
+  fill: var(--color-primary); stroke: var(--color-bg); stroke-width: 2.5; cursor: grab; opacity: 0;
   transition: r 0.15s var(--ease), opacity 0.15s var(--ease);
 }
 .react-flow__edge.selected .react-flow__edgeupdater { opacity: 1; }
-.react-flow__edgeupdater:hover { r: 9; }
+.react-flow__edgeupdater:hover { r: 13; }
+
+/* Mientras se arrastra una conexión, todos los lados de todos los nodos son un blanco visible. */
+.tz-canvas[data-connecting='true'] .tz-handle.react-flow__handle { opacity: 1; scale: 1.4; }
+.tz-handle.react-flow__handle.connectingto { scale: 2.2; }
+
+/* Selector de lado de la flecha seleccionada */
+.tz-sides {
+  position: absolute; left: 50%; bottom: 5.6rem; transform: translateX(-50%); z-index: 6;
+  display: flex; gap: 1.2rem; padding: 0.35rem 0.9rem;
+  border-radius: var(--radius-pill); white-space: nowrap;
+  background: color-mix(in oklch, var(--color-surface) 82%, transparent); backdrop-filter: blur(16px);
+  border: 1px solid var(--color-line);
+}
+.tz-sides__group { display: inline-flex; align-items: center; gap: 0.15rem; }
+.tz-sides__title { margin-right: 0.3rem; font: 500 0.68rem/1 var(--font-mono); color: var(--color-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.tz-sides__button {
+  width: 1.7rem; height: 1.7rem; border: 0; border-radius: 50%; background: transparent; font-size: 1rem; line-height: 1;
+  transition: background 0.15s var(--ease);
+}
+.tz-sides__button:hover { background: color-mix(in oklch, var(--color-primary) 22%, transparent); }
+.tz-sides__button[aria-pressed='true'] { background: var(--color-primary); color: var(--color-on-primary); }
 .tz-edge__label {
+.react-flow__edge:hover .react-flow__edgeupdater,
   position: absolute; pointer-events: all;
   padding: 0.15rem 0.6rem; border-radius: var(--radius-pill);
   background: var(--color-bg); color: var(--color-ink);
