@@ -13,6 +13,6 @@ export interface ExportedFile {
 }
 
 export interface Exporter {
-  readonly format: 'svg' | 'png';
+  readonly format: 'svg' | 'png' | 'json';
   export(request: ExportRequest): Promise<ExportedFile>;
 }

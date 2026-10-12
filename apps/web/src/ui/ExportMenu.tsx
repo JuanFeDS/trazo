@@ -5,6 +5,7 @@ import { useServices } from './services';
 const FORMATS = [
   { format: 'svg', label: 'SVG', hint: 'vectorial, editable' },
   { format: 'png', label: 'PNG', hint: 'imagen, doble resolución' },
+  { format: 'json', label: 'JSON', hint: 'el diagrama, para abrirlo en Trazo' },
 ] as const;
 
 export function ExportMenu() {
@@ -35,7 +36,7 @@ export function ExportMenu() {
     };
   }, [open]);
 
-  const run = async (format: 'svg' | 'png') => {
+  const run = async (format: (typeof FORMATS)[number]['format']) => {
     setOpen(false);
     setBusy(true);
     await exportDiagram(services, format);

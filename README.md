@@ -42,7 +42,7 @@ Mermaid, Excalidraw y draw.io ya son formatos de texto. Lo que faltaba no era un
 | 🔀 | **Flechas ajustables:** arrastra sus extremos o elige el lado por el que salen y entran |
 | 💾 | **Guardado local doble:** autoguardado en IndexedDB con lista de diagramas, y archivos `.json` en disco (File System Access API en Chrome y Edge; subida y descarga en otros navegadores) |
 | 🛡️ | **Esquema versionado y validado:** un archivo inválido muestra un error claro y no rompe la app |
-| 🖼️ | **Exportar** a SVG y PNG con las fuentes embebidas |
+| 🖼️ | **Exportar** a SVG y PNG (con las fuentes embebidas) y a JSON |
 | ↩️ | **Deshacer y rehacer** |
 | 🌗 | **Tema claro y oscuro** |
 
