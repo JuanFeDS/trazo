@@ -59,6 +59,25 @@ function mix(foreground: string, background: string, share: number): string {
   return `#${blended.map((value) => value.toString(16).padStart(2, '0')).join('')}`;
 }
 
+function luminance(hex: string): number {
+  const [red = 0, green = 0, blue = 0] = [1, 3, 5].map((start) => {
+    const channel = parseInt(hex.slice(start, start + 2), 16) / 255;
+    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+}
+
+function contrast(first: string, second: string): number {
+  const [light, dark] = [luminance(first), luminance(second)].sort((a, b) => b - a);
+  return ((light ?? 0) + 0.05) / ((dark ?? 0) + 0.05);
+}
+
+// Texto oscuro o blanco: el que dé más contraste (relación WCAG) sobre un color sólido.
+function readableOn(background: string): string {
+  const dark = '#14142a';
+  return contrast(background, dark) >= contrast(background, '#ffffff') ? dark : '#ffffff';
+}
+
 function wrap(text: string, maxWidth: number, font: string, measure: SceneOptions['measure']): string[] {
   const lines: string[] = [];
   let current = '';
@@ -254,15 +273,19 @@ function mindmapParts(diagram: MindmapDiagram, positions: Record<string, Positio
         textBlock(node.label, center, textWidth, style, measure),
       ];
     }
-    const style: TextStyle = { font: `600 14.7px ${SANS}`, family: SANS, weight: 600, size: 14.7, fill: palette.ink };
-    if (info?.depth === 1) {
-      return [
-        `<rect x="${x + 0.75}" y="${y + 0.75}" width="${box.width - 1.5}" height="${box.height - 1.5}" rx="${box.height / 2}" fill="${mix(color, palette.surface, 0.18)}" stroke="${color}" stroke-width="1.5"/>`,
-        textBlock(node.label, center, textWidth, style, measure),
-      ];
-    }
+    const depth = info?.depth ?? 1;
+    const solid = depth === 1;
+    const style: TextStyle = {
+      font: `${solid ? 700 : 600} 14.7px ${SANS}`,
+      family: SANS,
+      weight: solid ? 700 : 600,
+      size: 14.7,
+      fill: solid ? readableOn(color) : palette.ink,
+    };
+    const fill = solid ? color : mix(color, palette.surface, depth === 2 ? 0.46 : 0.27);
+    const stroke = depth >= 3 ? mix(color, palette.bg, 0.75) : color;
     return [
-      `<path d="M${x} ${y + box.height - 1} H${x + box.width}" stroke="${color}" stroke-width="2" fill="none"/>`,
+      `<rect x="${x + 0.75}" y="${y + 0.75}" width="${box.width - 1.5}" height="${box.height - 1.5}" rx="${box.height / 2}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`,
       textBlock(node.label, center, textWidth, style, measure),
     ];
   });
