@@ -3,7 +3,7 @@ import { useDiagramStore } from '../state/diagramStore';
 import type { TrazoNode } from './flowAdapter';
 import { NodeLabel } from './NodeLabel';
 
-const SIDES = [Side.Left, Side.Right] as const;
+const SIDES = [Side.Top, Side.Right, Side.Bottom, Side.Left] as const;
 
 export function MindNode({ id, data, selected }: NodeProps<TrazoNode>) {
   const startEditing = useDiagramStore((state) => state.startEditing);

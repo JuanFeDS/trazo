@@ -125,6 +125,19 @@ describe('árbol del mapa mental', () => {
     expect(errorsOf(orphan)).toContain('nodes[2].parent: el nodo "nadie" no existe');
   });
 
+  it('acepta el lado de una rama y rechaza uno inválido', () => {
+    const withSide = {
+      ...minimalMindmap,
+      nodes: [{ id: 'r', label: 'Raíz', parent: null }, { id: 'a', label: 'A', parent: 'r', side: 'left' }],
+    };
+    const result = validateDiagram(withSide);
+    expect(result.ok && result.diagram.nodes[1]).toMatchObject({ side: 'left' });
+    const vertical = { ...withSide, nodes: [withSide.nodes[0], { ...withSide.nodes[1], side: 'top' }] };
+    expect(validateDiagram(vertical).ok).toBe(true);
+    const invalid = { ...withSide, nodes: [withSide.nodes[0], { ...withSide.nodes[1], side: 'arriba' }] };
+    expect(errorsOf(invalid)).toContain('nodes[1].side: debe ser left, right, top o bottom');
+  });
+
   it('detecta ciclos de padres', () => {
     const cycle = {
       ...minimalMindmap,

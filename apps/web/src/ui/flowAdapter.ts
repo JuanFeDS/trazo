@@ -8,8 +8,8 @@ import {
   type Side,
 } from '@trazo/core';
 import { MarkerType, type Connection, type Edge, type Node } from '@xyflow/react';
-import { mindBranches, pickHandles } from '../geometry';
-import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../nodeSizes';
+import { OPPOSITE_SIDE, mindBranches, pickHandles } from '../shared/geometry';
+import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../shared/nodeSizes';
 
 export interface TrazoNodeData extends Record<string, unknown> {
   label: string;
@@ -159,8 +159,8 @@ function mindmapEdges(diagram: MindmapDiagram, auto: PositionMap): TrazoEdge[] {
         type: 'mind' as const,
         source: parent.id,
         target: node.id,
-        sourceHandle: sides[node.id] === 'left' ? 'left' : 'right',
-        targetHandle: sides[node.id] === 'left' ? 'right' : 'left',
+        sourceHandle: sides[node.id] ?? 'right',
+        targetHandle: OPPOSITE_SIDE[sides[node.id] ?? 'right'],
         selectable: false,
         deletable: false,
         focusable: false,

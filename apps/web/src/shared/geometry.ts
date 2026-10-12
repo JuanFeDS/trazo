@@ -6,6 +6,13 @@ const VERTICAL_BIAS = 0.6;
 // Una decisión solo sale por el costado si el destino queda desplazado al menos media anchura.
 const DECISION_SIDE_EXIT = FLOW_WIDTH / 2;
 
+export const OPPOSITE_SIDE: Record<Side, Side> = {
+  top: 'bottom',
+  bottom: 'top',
+  left: 'right',
+  right: 'left',
+};
+
 export function pickHandles(
   from?: Position,
   to?: Position,

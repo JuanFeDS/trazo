@@ -36,13 +36,13 @@ Mermaid, Excalidraw y draw.io ya son formatos de texto. Lo que faltaba no era un
 
 | | Funcionalidad |
 |---|---|
-| 🧭 | **Dos tipos de diagrama:** diagrama de flujo (inicio, proceso, decisión, fin) y mapa mental con estructura central |
+| 🧭 | **Dos tipos de diagrama:** diagrama de flujo (inicio, proceso, decisión, fin) y mapa mental con estructura central, donde eliges hacia dónde sale cada rama (izquierda, derecha, arriba o abajo) |
 | ⌨️ | **Edición desde el lienzo con atajos:** en un mapa mental, Tab crea un hijo y Enter un hermano |
 | 🪄 | **Auto-layout** con elkjs: si un nodo no tiene posición, el editor lo ordena; lo que mueves a mano se respeta y "Reordenar" lo descarta |
 | 🔀 | **Flechas ajustables:** arrastra sus extremos o elige el lado por el que salen y entran |
 | 💾 | **Guardado local doble:** autoguardado en IndexedDB con lista de diagramas, y archivos `.json` en disco (File System Access API en Chrome y Edge; subida y descarga en otros navegadores) |
 | 🛡️ | **Esquema versionado y validado:** un archivo inválido muestra un error claro y no rompe la app |
-| 🖼️ | **Exportar** a SVG y PNG con las fuentes embebidas |
+| 🖼️ | **Exportar** a SVG y PNG (con las fuentes embebidas) y a JSON |
 | ↩️ | **Deshacer y rehacer** |
 | 🌗 | **Tema claro y oscuro** |
 
@@ -75,7 +75,8 @@ trazo/
 │       │   ├── domain/       # diagramas, operaciones puras, historial
 │       │   ├── schema/       # validación, migraciones y serialización
 │       │   ├── application/  # casos de uso: guardar, abrir, listar
-│       │   └── ports/        # interfaces: repositorio, archivos, layout, exportador
+│       │   ├── ports/        # interfaces: repositorio, archivos, layout, exportador
+│       │   └── api/          # API pública del paquete (`@trazo/core`)
 │       └── test/             # espeja src/
 └── apps/
     └── web/                  # React + Vite
@@ -83,7 +84,8 @@ trazo/
         │   ├── adapters/     # IndexedDB, archivos, elkjs, exportadores SVG/PNG
         │   ├── state/        # store de Zustand
         │   ├── ui/           # componentes, tema, tokens
-        │   └── main.tsx      # único punto donde se conectan los adaptadores
+        │   ├── shared/       # geometría y tamaños de nodo, usados por la UI y los adaptadores
+        │   └── app/          # main.tsx: único punto donde se conectan los adaptadores
         └── test/
 ```
 
@@ -132,6 +134,7 @@ Todo diagrama lleva `version` (entero), `type` y `title`. Las posiciones (`posit
 ```
 
 - Es un árbol: exactamente un nodo con `parent: null` (la raíz), y cada otro nodo apunta al id de su padre. No se admiten ciclos.
+- `side` (`left`, `right`, `top` o `bottom`) es opcional y solo cuenta en las ramas de primer nivel (hijas de la raíz); cada rama arrastra a sus descendientes en la misma dirección. Si falta, las ramas se alternan derecha e izquierda.
 
 **Versiones:** un archivo de una versión anterior se migra al abrirlo; uno de una versión más nueva que la app se rechaza con un mensaje que lo explica. Los ids de nodos y conexiones deben ser únicos.
 
@@ -182,6 +185,7 @@ Abre `http://localhost:5173/trazo/` (la app se sirve bajo `/trazo/`).
 | `Tab` (mapa mental) | Crear un hijo del nodo seleccionado |
 | `Enter` (mapa mental) | Crear un hermano |
 | `F2` (mapa mental) | Editar el nodo seleccionado |
+| `Alt` + `←` `→` `↑` `↓` (mapa mental) | Mover la rama de primer nivel seleccionada hacia ese lado de la raíz |
 
 ### Despliegue
 

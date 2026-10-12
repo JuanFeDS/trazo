@@ -290,14 +290,25 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .tz-link { border: 0; background: none; font-weight: 600; color: var(--color-primary); padding: 0.4rem; }
 .tz-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 
+/* Pantallas angostas: el título pasa a su propia fila para no recortarse. */
 @media (max-width: 1000px) {
   .tz-bar__status { display: none; }
-  .tz-bar { gap: 0.5rem; flex-wrap: wrap; padding-inline: 1rem; }
-  .tz-bar__title { flex: 1 1 8rem; }
+  .tz-bar { gap: 0.25rem 0.5rem; flex-wrap: wrap; padding-inline: 1rem; }
+  .tz-bar__title { order: 1; flex: 1 1 100%; }
 }
 
+/* Las barras flotantes ocupan el ancho disponible y se parten en filas en vez de desbordar. */
 @media (max-width: 720px) {
-  .tz-palette__hint { display: none; }
+  .tz-palette, .tz-sides {
+    left: 0.5rem; right: 0.5rem; bottom: 0.75rem; transform: none;
+    flex-wrap: wrap; justify-content: center; border-radius: 1.5rem; row-gap: 0;
+  }
+  .tz-sides { bottom: 5.25rem; gap: 0.5rem 1rem; }
+  .tz-palette__hint, .tz-palette kbd { display: none; }
+  .tz-palette__item { padding: 0.5rem 0.8rem; }
+  .tz-bar { padding-block: 0.6rem; }
+  .tz-bar__button, .tz-bar__theme { padding: 0.4rem 0.6rem; font-size: 0.9rem; }
+  .react-flow__controls { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
