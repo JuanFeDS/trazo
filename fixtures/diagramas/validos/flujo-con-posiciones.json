@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "type": "flowchart",
+  "title": "Revisión de un pedido",
+  "nodes": [
+    {
+      "id": "inicio",
+      "kind": "start",
+      "label": "Pedido recibido",
+      "position": {
+        "x": 240,
+        "y": 0
+      }
+    },
+    {
+      "id": "stock",
+      "kind": "decision",
+      "label": "¿Hay stock?",
+      "position": {
+        "x": 240,
+        "y": 120
+      }
+    },
+    {
+      "id": "preparar",
+      "kind": "process",
+      "label": "Preparar el envío",
+      "position": {
+        "x": 0,
+        "y": 340
+      }
+    },
+    {
+      "id": "avisar",
+      "kind": "process",
+      "label": "Avisar al cliente",
+      "position": {
+        "x": 480,
+        "y": 340
+      }
+    },
+    {
+      "id": "enviar",
+      "kind": "process",
+      "label": "Enviar",
+      "position": {
+        "x": 0,
+        "y": 480
+      }
+    },
+    {
+      "id": "fin",
+      "kind": "end",
+      "label": "Pedido cerrado",
+      "position": {
+        "x": 240,
+        "y": 620
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "inicio",
+      "to": "stock",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e2",
+      "from": "stock",
+      "to": "preparar",
+      "label": "Sí",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "e3",
+      "from": "stock",
+      "to": "avisar",
+      "label": "No",
+      "fromSide": "right",
+      "toSide": "top"
+    },
+    {
+      "id": "e4",
+      "from": "preparar",
+      "to": "enviar",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "e5",
+      "from": "enviar",
+      "to": "fin",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "e6",
+      "from": "avisar",
+      "to": "fin",
+      "fromSide": "bottom",
+      "toSide": "right"
+    }
+  ]
+}

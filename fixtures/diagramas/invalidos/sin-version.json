@@ -1,0 +1,12 @@
+{
+  "type": "flowchart",
+  "title": "Falta el campo version",
+  "nodes": [
+    {
+      "id": "a",
+      "kind": "start",
+      "label": "Inicio"
+    }
+  ],
+  "edges": []
+}

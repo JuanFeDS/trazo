@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "type": "mindmap",
+  "title": "Hijo cuyo padre no existe",
+  "nodes": [
+    {
+      "id": "raiz",
+      "label": "Raíz",
+      "parent": null
+    },
+    {
+      "id": "huerfano",
+      "label": "Sin padre",
+      "parent": "fantasma"
+    }
+  ]
+}

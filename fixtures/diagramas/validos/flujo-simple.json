@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "type": "flowchart",
+  "title": "Pedir un café",
+  "nodes": [
+    {
+      "id": "inicio",
+      "kind": "start",
+      "label": "Llegar a la caja"
+    },
+    {
+      "id": "pedir",
+      "kind": "process",
+      "label": "Pedir la bebida"
+    },
+    {
+      "id": "hay",
+      "kind": "decision",
+      "label": "¿Hay existencias?"
+    },
+    {
+      "id": "pagar",
+      "kind": "process",
+      "label": "Pagar y esperar"
+    },
+    {
+      "id": "fin",
+      "kind": "end",
+      "label": "Recoger el café"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "inicio",
+      "to": "pedir"
+    },
+    {
+      "id": "e2",
+      "from": "pedir",
+      "to": "hay"
+    },
+    {
+      "id": "e3",
+      "from": "hay",
+      "to": "pagar",
+      "label": "Sí"
+    },
+    {
+      "id": "e4",
+      "from": "hay",
+      "to": "pedir",
+      "label": "No"
+    },
+    {
+      "id": "e5",
+      "from": "pagar",
+      "to": "fin"
+    }
+  ]
+}
