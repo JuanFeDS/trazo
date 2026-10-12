@@ -1,4 +1,4 @@
-import type { MindmapDiagram, MindNode, Position } from './diagram';
+import type { MindmapDiagram, MindNode, MindSide, Position } from './diagram';
 import { DomainError } from './operations';
 
 function requireNode(diagram: MindmapDiagram, nodeId: string): MindNode {
@@ -57,17 +57,18 @@ export function moveMindNode(diagram: MindmapDiagram, nodeId: string, position: 
   };
 }
 
-export type MindSide = 'left' | 'right';
+function topLevelNodes(diagram: MindmapDiagram): MindNode[] {
+  const byId = new Map(diagram.nodes.map((node) => [node.id, node]));
+  return diagram.nodes.filter((node) => node.parent !== null && byId.get(node.parent)?.parent === null);
+}
 
-// Las ramas de primer nivel se alternan derecha/izquierda; cada rama arrastra a sus descendientes.
+// Las ramas de primer nivel se alternan derecha/izquierda salvo que traigan `side`; cada rama
+// arrastra a sus descendientes.
 export function computeSides(diagram: MindmapDiagram): Record<string, MindSide> {
   const byId = new Map(diagram.nodes.map((node) => [node.id, node]));
-  const topLevel = diagram.nodes.filter(
-    (node) => node.parent !== null && byId.get(node.parent)?.parent === null,
-  );
   const sides: Record<string, MindSide> = {};
-  topLevel.forEach((node, index) => {
-    sides[node.id] = index % 2 === 0 ? 'right' : 'left';
+  topLevelNodes(diagram).forEach((node, index) => {
+    sides[node.id] = node.side ?? (index % 2 === 0 ? 'right' : 'left');
   });
 
   const resolve = (node: MindNode): MindSide | undefined => {
@@ -86,21 +87,49 @@ export function computeSides(diagram: MindmapDiagram): Record<string, MindSide> 
   return sides;
 }
 
+function branchIds(diagram: MindmapDiagram, nodeId: string): Set<string> {
+  const ids = new Set([nodeId]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const node of diagram.nodes) {
+      if (node.parent !== null && ids.has(node.parent) && !ids.has(node.id)) {
+        ids.add(node.id);
+        grew = true;
+      }
+    }
+  }
+  return ids;
+}
+
 export function removeBranch(diagram: MindmapDiagram, nodeId: string): MindmapDiagram {
   const target = requireNode(diagram, nodeId);
   if (target.parent === null) {
     throw new DomainError('No se puede borrar la raíz');
   }
-  const doomed = new Set([nodeId]);
-  let grew = true;
-  while (grew) {
-    grew = false;
-    for (const node of diagram.nodes) {
-      if (node.parent !== null && doomed.has(node.parent) && !doomed.has(node.id)) {
-        doomed.add(node.id);
-        grew = true;
-      }
-    }
-  }
+  const doomed = branchIds(diagram, nodeId);
   return { ...diagram, nodes: diagram.nodes.filter((node) => !doomed.has(node.id)) };
+}
+
+// Fija el lado de todas las ramas de primer nivel (para que cambiar una no desplace a las demás)
+// y descarta las posiciones manuales de la rama movida, que quedarían en el lado equivocado.
+export function setBranchSide(diagram: MindmapDiagram, nodeId: string, side: MindSide): MindmapDiagram {
+  const target = requireNode(diagram, nodeId);
+  const topLevel = new Set(topLevelNodes(diagram).map((node) => node.id));
+  if (!topLevel.has(target.id)) {
+    throw new DomainError('Solo se puede elegir el lado de una rama de primer nivel');
+  }
+  const current = computeSides(diagram);
+  const moved = branchIds(diagram, nodeId);
+  return {
+    ...diagram,
+    nodes: diagram.nodes.map((node) => {
+      const { position, ...rest } = node;
+      const isMoved = moved.has(node.id);
+      const withSide = topLevel.has(node.id)
+        ? { ...rest, side: node.id === nodeId ? side : (current[node.id] ?? 'right') }
+        : rest;
+      return isMoved || position === undefined ? withSide : { ...withSide, position };
+    }),
+  };
 }

@@ -7,6 +7,7 @@ import {
   moveMindNode,
   removeBranch,
   renameMindNode,
+  setBranchSide,
 } from '../../src/domain/mindmap';
 import { DomainError } from '../../src/domain/operations';
 
@@ -53,6 +54,57 @@ describe('computeSides', () => {
 
   it('la raíz no tiene lado', () => {
     expect(computeSides(root)).toEqual({});
+  });
+});
+
+describe('setBranchSide', () => {
+  const withBranches = addChild(addChild(tree, 'r', { id: 'c', label: 'C' }), 'a1', { id: 'a2', label: 'A2' });
+  const positioned = moveMindNode(moveMindNode(withBranches, 'a1', { x: 1, y: 1 }), 'b', { x: 2, y: 2 });
+
+  it('computeSides respeta el lado explícito y alterna el resto', () => {
+    const sides = computeSides({
+      ...root,
+      nodes: [
+        { id: 'r', label: 'Raíz', parent: null },
+        { id: 'a', label: 'A', parent: 'r', side: 'left' },
+        { id: 'b', label: 'B', parent: 'r' },
+        { id: 'a1', label: 'A1', parent: 'a' },
+      ],
+    });
+    expect(sides).toEqual({ a: 'left', b: 'left', a1: 'left' });
+  });
+
+  it('mueve la rama y toda su descendencia al otro lado', () => {
+    const next = setBranchSide(positioned, 'a', 'left');
+    expect(computeSides(next)).toMatchObject({ a: 'left', a1: 'left', a2: 'left' });
+  });
+
+  it('admite ramas hacia arriba y hacia abajo', () => {
+    const up = setBranchSide(positioned, 'a', 'top');
+    const down = setBranchSide(up, 'b', 'bottom');
+    expect(computeSides(down)).toMatchObject({ a: 'top', a1: 'top', a2: 'top', b: 'bottom', b1: 'bottom' });
+  });
+
+  it('fija el lado de las demás ramas para que no se desplacen', () => {
+    const before = computeSides(positioned);
+    const next = setBranchSide(positioned, 'a', 'left');
+    const after = computeSides(next);
+    for (const id of ['b', 'b1', 'c']) {
+      expect(after[id]).toBe(before[id]);
+    }
+    expect(next.nodes.find((node) => node.id === 'b')).toHaveProperty('side', 'left');
+  });
+
+  it('descarta las posiciones manuales de la rama movida y conserva las demás', () => {
+    const next = setBranchSide(positioned, 'a', 'left');
+    expect(next.nodes.find((node) => node.id === 'a1')).not.toHaveProperty('position');
+    expect(next.nodes.find((node) => node.id === 'b')).toHaveProperty('position', { x: 2, y: 2 });
+  });
+
+  it('solo admite ramas de primer nivel', () => {
+    expect(() => setBranchSide(positioned, 'a1', 'left')).toThrow(DomainError);
+    expect(() => setBranchSide(positioned, 'r', 'left')).toThrow(DomainError);
+    expect(() => setBranchSide(positioned, 'nadie', 'left')).toThrow(DomainError);
   });
 });
 

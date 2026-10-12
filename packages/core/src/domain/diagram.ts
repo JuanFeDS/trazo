@@ -12,10 +12,14 @@ export interface FlowNode {
   position?: Position;
 }
 
+export type MindSide = 'left' | 'right' | 'top' | 'bottom';
+
 export interface MindNode {
   id: string;
   label: string;
   parent: string | null;
+  // Solo cuenta en las ramas de primer nivel; si falta, se alternan derecha e izquierda.
+  side?: MindSide;
   position?: Position;
 }
 
