@@ -1,8 +1,10 @@
+import { canRedo, canUndo } from '@trazo/core';
 import { ReactFlowProvider } from '@xyflow/react';
 import { useEffect, useState } from 'react';
 import { useDiagramStore } from '../state/diagramStore';
 import { Canvas } from './Canvas';
 import { DocumentsPanel } from './DocumentsPanel';
+import { ExportMenu } from './ExportMenu';
 import { NoticeBanner } from './NoticeBanner';
 import { bootDocuments, openFromDisk, saveToDisk } from './documentActions';
 import { useServices } from './services';
@@ -23,6 +25,10 @@ export function App() {
   const title = useDiagramStore((state) => state.diagram.title);
   const saveStatus = useDiagramStore((state) => state.saveStatus);
   const renameDiagram = useDiagramStore((state) => state.renameDiagram);
+  const canUndoNow = useDiagramStore((state) => canUndo(state.history));
+  const canRedoNow = useDiagramStore((state) => canRedo(state.history));
+  const undo = useDiagramStore((state) => state.undo);
+  const redo = useDiagramStore((state) => state.redo);
 
   useAutosave(services);
 
@@ -35,12 +41,22 @@ export function App() {
       if (!(event.ctrlKey || event.metaKey)) {
         return;
       }
-      if (event.key === 's') {
+      const key = event.key.toLowerCase();
+      const isTextField =
+        event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement;
+      if (key === 's') {
         event.preventDefault();
         void saveToDisk(services);
-      } else if (event.key === 'o') {
+      } else if (key === 'o') {
         event.preventDefault();
         void openFromDisk(services);
+      } else if (!isTextField && key === 'z') {
+        event.preventDefault();
+        const { undo, redo } = useDiagramStore.getState();
+        (event.shiftKey ? redo : undo)();
+      } else if (!isTextField && key === 'y') {
+        event.preventDefault();
+        useDiagramStore.getState().redo();
       }
     };
     window.addEventListener('keydown', onKeyDown);
@@ -73,12 +89,35 @@ export function App() {
         <span className="tz-bar__status" data-status={saveStatus}>
           {STATUS_TEXT[saveStatus]}
         </span>
+        <div className="tz-bar__group" role="group" aria-label="Historial">
+          <button
+            type="button"
+            className="tz-bar__icon"
+            title="Deshacer (Ctrl+Z)"
+            aria-label="Deshacer"
+            disabled={!canUndoNow}
+            onClick={undo}
+          >
+            ↶
+          </button>
+          <button
+            type="button"
+            className="tz-bar__icon"
+            title="Rehacer (Ctrl+Mayús+Z)"
+            aria-label="Rehacer"
+            disabled={!canRedoNow}
+            onClick={redo}
+          >
+            ↷
+          </button>
+        </div>
         <button type="button" className="tz-bar__button" onClick={() => void openFromDisk(services)}>
           Abrir
         </button>
         <button type="button" className="tz-bar__button" onClick={() => void saveToDisk(services)}>
           Guardar
         </button>
+        <ExportMenu />
         <button type="button" className="tz-bar__theme" onClick={toggleTheme} aria-label="Cambiar tema">
           {theme === 'dark' ? 'Claro' : 'Oscuro'}
         </button>

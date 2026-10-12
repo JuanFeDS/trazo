@@ -5,6 +5,8 @@ import {
   saveDiagramFile,
   saveDocument,
   type Diagram,
+  type ExportedFile,
+  type Exporter,
 } from '@trazo/core';
 import { newId, useDiagramStore } from '../state/diagramStore';
 import type { Services } from './services';
@@ -98,6 +100,34 @@ export async function saveToDisk({ files }: Services): Promise<void> {
     }
   } catch (error) {
     store.showNotice({ kind: 'error', title: 'No se pudo guardar el archivo', details: describe(error) });
+  }
+}
+
+function download(file: ExportedFile): void {
+  const part = typeof file.data === 'string' ? file.data : new Uint8Array(file.data);
+  const url = URL.createObjectURL(new Blob([part], { type: file.mimeType }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = file.fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+export async function exportDiagram(
+  { exporters }: Services,
+  format: Exporter['format'],
+): Promise<void> {
+  const { diagram, autoPositions, showNotice } = useDiagramStore.getState();
+  try {
+    const file = await exporters[format].export({ diagram, positions: autoPositions });
+    download(file);
+    showNotice({ kind: 'info', title: `Exportado «${file.fileName}»`, details: [] });
+  } catch (error) {
+    showNotice({
+      kind: 'error',
+      title: `No se pudo exportar a ${format.toUpperCase()}`,
+      details: describe(error),
+    });
   }
 }
 

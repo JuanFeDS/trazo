@@ -6,7 +6,11 @@ import {
   computeSides,
   connect,
   createFlowchart,
+  createHistory,
   createMindmap,
+  pushHistory,
+  redo as redoHistory,
+  undo as undoHistory,
   exampleFlowchart,
   moveMindNode,
   moveNode,
@@ -21,6 +25,7 @@ import {
   type Diagram,
   type EdgeEndpoints,
   type FlowchartDiagram,
+  type History,
   type MindmapDiagram,
   type NodeKind,
   type Position,
@@ -51,9 +56,13 @@ export interface OpenDocument {
   token?: unknown;
 }
 
+type ChangeKind = 'edit' | 'move' | 'title';
+
 interface DiagramState {
   documentId: string;
   diagram: Diagram;
+  history: History<Diagram>;
+  lastChange: { kind: ChangeKind | null; at: number };
   fileToken: unknown;
   saveStatus: SaveStatus;
   notice: Notice | null;
@@ -83,6 +92,8 @@ interface DiagramState {
   startEditing: (nodeId: string) => void;
   stopEditing: () => void;
   loadExample: () => void;
+  undo: () => void;
+  redo: () => void;
 }
 
 export function newId(prefix: string): string {
@@ -93,18 +104,45 @@ export function selectActiveDiagram(state: DiagramState): Diagram {
   return state.diagram;
 }
 
+const COALESCE_MS = 800;
+
+// Los arrastres y las pulsaciones del título llegan en ráfagas: se funden en un solo paso de deshacer.
+function commit(
+  state: DiagramState,
+  diagram: Diagram,
+  kind: ChangeKind = 'edit',
+): Partial<DiagramState> {
+  if (diagram === state.diagram) {
+    return {};
+  }
+  const now = Date.now();
+  const coalesce =
+    kind !== 'edit' && state.lastChange.kind === kind && now - state.lastChange.at < COALESCE_MS;
+  return {
+    diagram,
+    history: pushHistory(state.history, diagram, coalesce),
+    lastChange: { kind, at: now },
+  };
+}
+
+function freshHistory(diagram: Diagram): Partial<DiagramState> {
+  return { history: createHistory(diagram), lastChange: { kind: null, at: 0 } };
+}
+
 function withFlowchart(
   state: DiagramState,
   change: (diagram: FlowchartDiagram) => FlowchartDiagram,
+  kind?: ChangeKind,
 ): Partial<DiagramState> {
-  return state.diagram.type === 'flowchart' ? { diagram: change(state.diagram) } : {};
+  return state.diagram.type === 'flowchart' ? commit(state, change(state.diagram), kind) : {};
 }
 
 function withMindmap(
   state: DiagramState,
   change: (diagram: MindmapDiagram) => MindmapDiagram,
+  kind?: ChangeKind,
 ): Partial<DiagramState> {
-  return state.diagram.type === 'mindmap' ? { diagram: change(state.diagram) } : {};
+  return state.diagram.type === 'mindmap' ? commit(state, change(state.diagram), kind) : {};
 }
 
 const CHILD_DISTANCE = 300;
@@ -135,6 +173,8 @@ function hasNode(diagram: Diagram, nodeId: string): boolean {
 export const useDiagramStore = create<DiagramState>((set) => ({
   documentId: newId('d'),
   diagram: exampleFlowchart,
+  history: createHistory<Diagram>(exampleFlowchart),
+  lastChange: { kind: null, at: 0 },
   fileToken: undefined,
   saveStatus: 'saved',
   notice: null,
@@ -146,6 +186,7 @@ export const useDiagramStore = create<DiagramState>((set) => ({
     set({
       documentId: id,
       diagram,
+      ...freshHistory(diagram),
       fileToken: token,
       saveStatus: 'saved',
       autoPositions: {},
@@ -153,21 +194,25 @@ export const useDiagramStore = create<DiagramState>((set) => ({
       editingNodeId: null,
     }),
 
-  newDocument: (type) =>
+  newDocument: (type) => {
+    const diagram =
+      type === 'flowchart'
+        ? createFlowchart(UNTITLED)
+        : createMindmap(UNTITLED, newId('m'), 'Idea central');
     set({
       documentId: newId('d'),
-      diagram:
-        type === 'flowchart'
-          ? createFlowchart(UNTITLED)
-          : createMindmap(UNTITLED, newId('m'), 'Idea central'),
+      diagram,
+      ...freshHistory(diagram),
       fileToken: undefined,
       saveStatus: 'saved',
       autoPositions: {},
       selectedNodeIds: [],
       editingNodeId: null,
-    }),
+    });
+  },
 
-  renameDiagram: (title) => set((state) => ({ diagram: setTitle(state.diagram, title) })),
+  renameDiagram: (title) =>
+    set((state) => commit(state, setTitle(state.diagram, title), 'title')),
   setFileToken: (token) => set({ fileToken: token }),
   setSaveStatus: (status) => set({ saveStatus: status }),
   showNotice: (notice) => set({ notice }),
@@ -175,7 +220,7 @@ export const useDiagramStore = create<DiagramState>((set) => ({
 
   setAutoPositions: (positions) => set({ autoPositions: positions }),
 
-  rearrange: () => set((state) => ({ diagram: clearPositions(state.diagram) })),
+  rearrange: () => set((state) => commit(state, clearPositions(state.diagram))),
 
   addFlowNode: (kind, position) => {
     const id = newId('n');
@@ -194,8 +239,8 @@ export const useDiagramStore = create<DiagramState>((set) => ({
         return state;
       }
       return state.diagram.type === 'flowchart'
-        ? withFlowchart(state, (diagram) => moveNode(diagram, nodeId, position))
-        : withMindmap(state, (diagram) => moveMindNode(diagram, nodeId, position));
+        ? withFlowchart(state, (diagram) => moveNode(diagram, nodeId, position), 'move')
+        : withMindmap(state, (diagram) => moveMindNode(diagram, nodeId, position), 'move');
     }),
 
   renameNode: (nodeId, label) =>
@@ -249,7 +294,7 @@ export const useDiagramStore = create<DiagramState>((set) => ({
       }
       const mindmap = addChild(state.diagram, parentId, { id, label: DEFAULT_MIND_LABEL });
       return {
-        diagram: mindmap,
+        ...commit(state, mindmap),
         autoPositions: withProvisional(state, mindmap, id, parentId, 'child'),
         selectedNodeIds: [id],
         editingNodeId: id,
@@ -273,7 +318,7 @@ export const useDiagramStore = create<DiagramState>((set) => ({
         ? addChild(state.diagram, nodeId, created)
         : addSibling(state.diagram, nodeId, created);
       return {
-        diagram: mindmap,
+        ...commit(state, mindmap),
         autoPositions: withProvisional(state, mindmap, id, nodeId, isRoot ? 'child' : 'sibling'),
         selectedNodeIds: [id],
         editingNodeId: id,
@@ -291,5 +336,32 @@ export const useDiagramStore = create<DiagramState>((set) => ({
   stopEditing: () => set({ editingNodeId: null }),
 
   loadExample: () =>
-    set({ diagram: exampleFlowchart, selectedNodeIds: [], editingNodeId: null, autoPositions: {} }),
+    set((state) => ({
+      ...commit(state, exampleFlowchart),
+      selectedNodeIds: [],
+      editingNodeId: null,
+      autoPositions: {},
+    })),
+
+  undo: () =>
+    set((state) => {
+      const history = undoHistory(state.history);
+      return history === state.history ? state : restore(state, history);
+    }),
+
+  redo: () =>
+    set((state) => {
+      const history = redoHistory(state.history);
+      return history === state.history ? state : restore(state, history);
+    }),
 }));
+
+function restore(state: DiagramState, history: History<Diagram>): Partial<DiagramState> {
+  return {
+    history,
+    diagram: history.present,
+    lastChange: { kind: null, at: 0 },
+    editingNodeId: null,
+    selectedNodeIds: state.selectedNodeIds.filter((nodeId) => hasNode(history.present, nodeId)),
+  };
+}

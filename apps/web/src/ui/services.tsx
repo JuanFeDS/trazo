@@ -1,10 +1,11 @@
-import type { DiagramRepository, FileGateway, LayoutEngine } from '@trazo/core';
+import type { DiagramRepository, Exporter, FileGateway, LayoutEngine } from '@trazo/core';
 import { createContext, useContext } from 'react';
 
 export interface Services {
   layoutEngine: LayoutEngine;
   repository: DiagramRepository;
   files: FileGateway;
+  exporters: Record<Exporter['format'], Exporter>;
 }
 
 const ServicesContext = createContext<Services | null>(null);

@@ -43,6 +43,26 @@ button { font: inherit; color: inherit; cursor: pointer; }
   transition: background 0.2s var(--ease);
 }
 .tz-bar__button:hover { background: color-mix(in oklch, var(--color-primary) 22%, transparent); }
+.tz-menu { position: relative; }
+.tz-menu__list {
+  position: absolute; top: calc(100% + 0.5rem); left: 0; z-index: 25; margin: 0; padding: 0.35rem; list-style: none; min-width: 14rem;
+  border-radius: 1rem; background: var(--color-surface); border: 1px solid var(--color-line);
+}
+.tz-menu__item {
+  width: 100%; display: grid; gap: 0.15rem; padding: 0.6rem 0.8rem; border: 0; border-radius: 0.7rem; background: transparent; text-align: left;
+}
+@media (min-width: 1001px) {
+  .tz-menu__list { left: auto; right: 0; }
+}
+.tz-menu__item:hover { background: color-mix(in oklch, var(--color-primary) 18%, transparent); }
+.tz-menu__item span { font: 500 0.72rem/1.2 var(--font-mono); color: var(--color-muted); }
+.tz-bar__group { display: inline-flex; }
+.tz-bar__icon {
+  width: 2.2rem; height: 2.2rem; border: 0; border-radius: 50%; background: transparent; font-size: 1.25rem; line-height: 1;
+  transition: background 0.2s var(--ease);
+}
+.tz-bar__icon:hover:not(:disabled) { background: color-mix(in oklch, var(--color-primary) 22%, transparent); }
+.tz-bar__icon:disabled { opacity: 0.35; cursor: default; }
 .tz-bar__theme {
   border: 0; border-radius: var(--radius-pill); padding: 0.55rem 1.1rem; font-weight: 600;
   background: color-mix(in oklch, var(--color-ink) 9%, transparent);
@@ -262,10 +282,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .tz-link { border: 0; background: none; font-weight: 600; color: var(--color-primary); padding: 0.4rem; }
 .tz-link:hover { text-decoration: underline; text-underline-offset: 4px; }
 
+@media (max-width: 1000px) {
+  .tz-bar__status { display: none; }
+  .tz-bar { gap: 0.5rem; flex-wrap: wrap; padding-inline: 1rem; }
+  .tz-bar__title { flex: 1 1 8rem; }
+}
+
 @media (max-width: 720px) {
   .tz-palette__hint { display: none; }
-  .tz-bar__status { display: none; }
-  .tz-bar { gap: 0.5rem; padding-inline: 1rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
