@@ -3,14 +3,14 @@ import type { FileGateway, SavedFile } from '../ports/files';
 import type { DiagramRepository, StoredSummary } from '../ports/repository';
 import { parseDiagram, serializeDiagram, validateDiagram, type ParseResult } from '../schema/validate';
 
-export function suggestFileName(title: string): string {
+export function suggestFileName(title: string, extension = 'json'): string {
   const slug = title
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
-  return `${slug || 'diagrama'}.json`;
+  return `${slug || 'diagrama'}.${extension}`;
 }
 
 export async function listDocuments(repository: DiagramRepository): Promise<StoredSummary[]> {
