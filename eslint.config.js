@@ -4,18 +4,20 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-// Carpetas: cualquier archivo dentro pertenece al elemento. Archivos sueltos: coincidencia exacta.
+// El plugin clasifica carpetas, no archivos sueltos: un archivo fuera de una carpeta de elemento
+// se escapa de la regla sin avisar. Por eso la API pública del núcleo vive en `api/` y la web en
+// `shared/` y `app/`, en vez de archivos sueltos.
 const elements = [
   { type: 'core-domain', pattern: 'packages/core/src/domain' },
   { type: 'core-schema', pattern: 'packages/core/src/schema' },
   { type: 'core-ports', pattern: 'packages/core/src/ports' },
   { type: 'core-application', pattern: 'packages/core/src/application' },
-  { type: 'core-index', pattern: 'packages/core/src/index.ts', partialMatch: false },
+  { type: 'core-api', pattern: 'packages/core/src/api' },
   { type: 'web-ui', pattern: 'apps/web/src/ui' },
   { type: 'web-state', pattern: 'apps/web/src/state' },
   { type: 'web-adapters', pattern: 'apps/web/src/adapters' },
-  { type: 'web-shared', pattern: 'apps/web/src/{geometry,nodeSizes}.ts', partialMatch: false },
-  { type: 'web-main', pattern: 'apps/web/src/main.tsx', partialMatch: false },
+  { type: 'web-shared', pattern: 'apps/web/src/shared' },
+  { type: 'web-main', pattern: 'apps/web/src/app' },
 ];
 
 // Regla de dependencias del RFC-004 §5.1: ui → application → domain; los adaptadores implementan
@@ -56,11 +58,12 @@ export default tseslint.config(
             allowOnly('core-schema', 'core-domain'),
             allowOnly('core-ports', 'core-domain'),
             allowOnly('core-application', 'core-domain', 'core-ports', 'core-schema'),
-            allowOnly('core-index', 'core-domain', 'core-schema', 'core-ports', 'core-application'),
-            allowOnly('web-state'),
-            allowOnly('web-ui', 'web-state', 'web-shared'),
-            allowOnly('web-adapters', 'web-shared'),
-            allowOnly('web-shared'),
+            allowOnly('core-api', 'core-domain', 'core-schema', 'core-ports', 'core-application'),
+            // Todo el código de la web consume el núcleo solo por su API pública (`@trazo/core`).
+            allowOnly('web-state', 'core-api'),
+            allowOnly('web-ui', 'web-state', 'web-shared', 'core-api'),
+            allowOnly('web-adapters', 'web-shared', 'core-api'),
+            allowOnly('web-shared', 'core-api'),
             allowOnly('web-main', 'web-ui', 'web-adapters'),
           ],
         },

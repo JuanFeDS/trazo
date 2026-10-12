@@ -7,7 +7,7 @@ import {
   type Position,
 } from '@trazo/core';
 import ELK, { type ElkNode } from 'elkjs/lib/elk.bundled.js';
-import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../nodeSizes';
+import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../shared/nodeSizes';
 
 const GRID = 20;
 

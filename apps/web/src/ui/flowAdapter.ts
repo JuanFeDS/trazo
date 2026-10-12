@@ -8,8 +8,8 @@ import {
   type Side,
 } from '@trazo/core';
 import { MarkerType, type Connection, type Edge, type Node } from '@xyflow/react';
-import { mindBranches, pickHandles } from '../geometry';
-import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../nodeSizes';
+import { mindBranches, pickHandles } from '../shared/geometry';
+import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../shared/nodeSizes';
 
 export interface TrazoNodeData extends Record<string, unknown> {
   label: string;

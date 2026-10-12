@@ -8,8 +8,8 @@ import {
   type Side,
 } from '@trazo/core';
 import { Position as FlowSide, getBezierPath, getSmoothStepPath } from '@xyflow/react';
-import { handlePoint, mindBranches, pickHandles } from '../../geometry';
-import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../../nodeSizes';
+import { handlePoint, mindBranches, pickHandles } from '../../shared/geometry';
+import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../../shared/nodeSizes';
 import type { Palette } from './palette';
 
 export interface SceneOptions {

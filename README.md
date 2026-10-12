@@ -75,7 +75,8 @@ trazo/
 │       │   ├── domain/       # diagramas, operaciones puras, historial
 │       │   ├── schema/       # validación, migraciones y serialización
 │       │   ├── application/  # casos de uso: guardar, abrir, listar
-│       │   └── ports/        # interfaces: repositorio, archivos, layout, exportador
+│       │   ├── ports/        # interfaces: repositorio, archivos, layout, exportador
+│       │   └── api/          # API pública del paquete (`@trazo/core`)
 │       └── test/             # espeja src/
 └── apps/
     └── web/                  # React + Vite
@@ -83,7 +84,8 @@ trazo/
         │   ├── adapters/     # IndexedDB, archivos, elkjs, exportadores SVG/PNG
         │   ├── state/        # store de Zustand
         │   ├── ui/           # componentes, tema, tokens
-        │   └── main.tsx      # único punto donde se conectan los adaptadores
+        │   ├── shared/       # geometría y tamaños de nodo, usados por la UI y los adaptadores
+        │   └── app/          # main.tsx: único punto donde se conectan los adaptadores
         └── test/
 ```
 
