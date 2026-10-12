@@ -19,6 +19,7 @@ import {
   removeEdge,
   removeNode,
   renameMindNode,
+  setBranchSide,
   setTitle,
   updateEdgeLabel,
   updateNode,
@@ -27,6 +28,7 @@ import {
   type FlowchartDiagram,
   type History,
   type MindmapDiagram,
+  type MindSide,
   type NodeKind,
   type Position,
 } from '@trazo/core';
@@ -88,6 +90,7 @@ interface DiagramState {
   removeEdges: (edgeIds: string[]) => void;
   addChildOf: (parentId: string) => void;
   addSiblingOf: (nodeId: string) => void;
+  setBranchSideOf: (nodeId: string, side: MindSide) => void;
   selectNode: (nodeId: string, selected: boolean) => void;
   startEditing: (nodeId: string) => void;
   stopEditing: () => void;
@@ -145,8 +148,28 @@ function withMindmap(
   return state.diagram.type === 'mindmap' ? commit(state, change(state.diagram), kind) : {};
 }
 
-const CHILD_DISTANCE = 300;
-const SIBLING_DISTANCE = 60;
+const CHILD_DISTANCE = { horizontal: 300, vertical: 120 };
+const SIBLING_DISTANCE = { horizontal: 60, vertical: 240 };
+
+// Un hijo se aleja del padre en la dirección de su rama; un hermano se corre a lo largo de ella.
+function provisionalOffset(side: MindSide, relation: 'child' | 'sibling'): Position {
+  const isVertical = side === 'top' || side === 'bottom';
+  if (relation === 'sibling') {
+    return isVertical
+      ? { x: SIBLING_DISTANCE.vertical, y: 0 }
+      : { x: 0, y: SIBLING_DISTANCE.horizontal };
+  }
+  switch (side) {
+    case 'left':
+      return { x: -CHILD_DISTANCE.horizontal, y: 0 };
+    case 'top':
+      return { x: 0, y: -CHILD_DISTANCE.vertical };
+    case 'bottom':
+      return { x: 0, y: CHILD_DISTANCE.vertical };
+    default:
+      return { x: CHILD_DISTANCE.horizontal, y: 0 };
+  }
+}
 
 // Posición inmediata para que el nodo nuevo se pinte y reciba foco sin esperar al layout asíncrono.
 function withProvisional(
@@ -158,11 +181,8 @@ function withProvisional(
 ): Record<string, Position> {
   const anchor = diagram.nodes.find((node) => node.id === anchorId);
   const base = anchor?.position ?? state.autoPositions[anchorId] ?? { x: 0, y: 0 };
-  const direction = computeSides(diagram)[nodeId] === 'left' ? -1 : 1;
-  const offset =
-    relation === 'child'
-      ? { x: CHILD_DISTANCE * direction, y: 0 }
-      : { x: 0, y: SIBLING_DISTANCE };
+  const side = computeSides(diagram)[nodeId] ?? 'right';
+  const offset = provisionalOffset(side, relation);
   return { ...state.autoPositions, [nodeId]: { x: base.x + offset.x, y: base.y + offset.y } };
 }
 
@@ -325,6 +345,9 @@ export const useDiagramStore = create<DiagramState>((set) => ({
       };
     });
   },
+
+  setBranchSideOf: (nodeId, side) =>
+    set((state) => withMindmap(state, (diagram) => setBranchSide(diagram, nodeId, side))),
 
   selectNode: (nodeId, selected) =>
     set((state) => {

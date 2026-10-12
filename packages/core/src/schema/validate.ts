@@ -3,6 +3,7 @@ import type {
   DiagramEdge,
   FlowNode,
   MindNode,
+  MindSide,
   NodeKind,
   Position,
   Side,
@@ -23,6 +24,7 @@ export interface ValidateOptions {
 const MAX_ERRORS = 10;
 const NODE_KINDS: readonly string[] = ['start', 'process', 'decision', 'end'];
 const SIDES: readonly string[] = ['top', 'right', 'bottom', 'left'];
+const MIND_SIDES: readonly string[] = SIDES;
 
 // Migraciones desde la versión N a la N+1. Vacío mientras exista solo la v1.
 const MIGRATIONS: Readonly<Record<number, Migration>> = {};
@@ -187,14 +189,25 @@ function validateMindNodes(items: unknown[], issues: Issues): MindNode[] {
     if (!hasValidParent) {
       issues.add(`${path}.parent`, 'debe ser el id del padre o null en la raíz');
     }
+    const side = item.side;
+    const hasValidSide = side === undefined || (typeof side === 'string' && MIND_SIDES.includes(side));
+    if (!hasValidSide) {
+      issues.add(`${path}.side`, 'debe ser left, right, top o bottom');
+    }
     const position = readOptionalPosition(item, path, issues);
     if (id !== undefined && seen.has(id)) {
       issues.add(`${path}.id`, `el id "${id}" está repetido`);
     } else if (id !== undefined) {
       seen.add(id);
     }
-    if (id !== undefined && label !== undefined && hasValidParent) {
-      nodes.push({ id, label, parent: parent as string | null, ...(position && { position }) });
+    if (id !== undefined && label !== undefined && hasValidParent && hasValidSide) {
+      nodes.push({
+        id,
+        label,
+        parent: parent as string | null,
+        ...(side && { side: side as MindSide }),
+        ...(position && { position }),
+      });
     }
   });
   return nodes;

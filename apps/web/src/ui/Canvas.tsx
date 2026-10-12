@@ -15,6 +15,7 @@ import {
 import type { NodeKind } from '@trazo/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { selectActiveDiagram, useDiagramStore } from '../state/diagramStore';
+import { BranchSideBar, SIDE_OPTIONS, isTopLevelBranch } from './BranchSideBar';
 import { EdgeSidesBar } from './EdgeSidesBar';
 import { FlowEdge } from './FlowEdge';
 import { FlowNode } from './FlowNode';
@@ -54,7 +55,7 @@ export function Canvas({ theme }: { theme: Theme }) {
     () =>
       diagram.type === 'flowchart'
         ? JSON.stringify([diagram.nodes.map((node) => [node.id, node.kind]), diagram.edges.map((edge) => [edge.from, edge.to])])
-        : JSON.stringify(diagram.nodes.map((node) => [node.id, node.parent])),
+        : JSON.stringify(diagram.nodes.map((node) => [node.id, node.parent, node.side ?? null])),
     [diagram],
   );
 
@@ -99,7 +100,16 @@ export function Canvas({ theme }: { theme: Theme }) {
         return;
       }
       const store = useDiagramStore.getState();
-      if (event.key === 'Tab') {
+      const sideShortcut = event.altKey
+        ? SIDE_OPTIONS.find((option) => option.key === event.key)
+        : undefined;
+      if (sideShortcut) {
+        event.preventDefault();
+        const { diagram: current } = store;
+        if (current.type === 'mindmap' && isTopLevelBranch(current, selectedId)) {
+          store.setBranchSideOf(selectedId, sideShortcut.side);
+        }
+      } else if (event.key === 'Tab') {
         event.preventDefault();
         store.addChildOf(selectedId);
       } else if (event.key === 'Enter') {
@@ -217,6 +227,9 @@ export function Canvas({ theme }: { theme: Theme }) {
       )}
 
       {!isMindmap && selectedEdge && <EdgeSidesBar edge={selectedEdge} />}
+      {diagram.type === 'mindmap' && selectedId && isTopLevelBranch(diagram, selectedId) && (
+        <BranchSideBar diagram={diagram} nodeId={selectedId} />
+      )}
 
       <div className="tz-palette" role="toolbar" aria-label={isMindmap ? 'Editar mapa mental' : 'Agregar nodos'}>
         {isMindmap ? (
