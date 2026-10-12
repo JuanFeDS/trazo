@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "type": "flowchart",
+  "title": "Conexión a un nodo que no existe",
+  "nodes": [
+    {
+      "id": "a",
+      "kind": "start",
+      "label": "Inicio"
+    },
+    {
+      "id": "b",
+      "kind": "end",
+      "label": "Fin"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "a",
+      "to": "fantasma"
+    }
+  ]
+}

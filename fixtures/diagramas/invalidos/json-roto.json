@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "type": "flowchart",
+  "title": "Archivo cortado a la mitad",
+  "nodes": [
+    { "id": "a", "kind": "start", "label": "Inic

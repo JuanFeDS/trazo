@@ -1,0 +1,420 @@
+{
+  "version": 1,
+  "type": "mindmap",
+  "title": "Mapa mental de 81 nodos",
+  "nodes": [
+    {
+      "id": "raiz",
+      "label": "Proyecto grande",
+      "parent": null
+    },
+    {
+      "id": "r1",
+      "label": "Área 1",
+      "parent": "raiz",
+      "side": "right"
+    },
+    {
+      "id": "r1-h1",
+      "label": "Tema 1.1",
+      "parent": "r1"
+    },
+    {
+      "id": "r1-h1-n1",
+      "label": "Detalle 1.1.1",
+      "parent": "r1-h1"
+    },
+    {
+      "id": "r1-h1-n2",
+      "label": "Detalle 1.1.2",
+      "parent": "r1-h1"
+    },
+    {
+      "id": "r1-h2",
+      "label": "Tema 1.2",
+      "parent": "r1"
+    },
+    {
+      "id": "r1-h2-n1",
+      "label": "Detalle 1.2.1",
+      "parent": "r1-h2"
+    },
+    {
+      "id": "r1-h2-n2",
+      "label": "Detalle 1.2.2",
+      "parent": "r1-h2"
+    },
+    {
+      "id": "r1-h3",
+      "label": "Tema 1.3",
+      "parent": "r1"
+    },
+    {
+      "id": "r1-h3-n1",
+      "label": "Detalle 1.3.1",
+      "parent": "r1-h3"
+    },
+    {
+      "id": "r1-h3-n2",
+      "label": "Detalle 1.3.2",
+      "parent": "r1-h3"
+    },
+    {
+      "id": "r2",
+      "label": "Área 2",
+      "parent": "raiz",
+      "side": "left"
+    },
+    {
+      "id": "r2-h1",
+      "label": "Tema 2.1",
+      "parent": "r2"
+    },
+    {
+      "id": "r2-h1-n1",
+      "label": "Detalle 2.1.1",
+      "parent": "r2-h1"
+    },
+    {
+      "id": "r2-h1-n2",
+      "label": "Detalle 2.1.2",
+      "parent": "r2-h1"
+    },
+    {
+      "id": "r2-h2",
+      "label": "Tema 2.2",
+      "parent": "r2"
+    },
+    {
+      "id": "r2-h2-n1",
+      "label": "Detalle 2.2.1",
+      "parent": "r2-h2"
+    },
+    {
+      "id": "r2-h2-n2",
+      "label": "Detalle 2.2.2",
+      "parent": "r2-h2"
+    },
+    {
+      "id": "r2-h3",
+      "label": "Tema 2.3",
+      "parent": "r2"
+    },
+    {
+      "id": "r2-h3-n1",
+      "label": "Detalle 2.3.1",
+      "parent": "r2-h3"
+    },
+    {
+      "id": "r2-h3-n2",
+      "label": "Detalle 2.3.2",
+      "parent": "r2-h3"
+    },
+    {
+      "id": "r3",
+      "label": "Área 3",
+      "parent": "raiz",
+      "side": "top"
+    },
+    {
+      "id": "r3-h1",
+      "label": "Tema 3.1",
+      "parent": "r3"
+    },
+    {
+      "id": "r3-h1-n1",
+      "label": "Detalle 3.1.1",
+      "parent": "r3-h1"
+    },
+    {
+      "id": "r3-h1-n2",
+      "label": "Detalle 3.1.2",
+      "parent": "r3-h1"
+    },
+    {
+      "id": "r3-h2",
+      "label": "Tema 3.2",
+      "parent": "r3"
+    },
+    {
+      "id": "r3-h2-n1",
+      "label": "Detalle 3.2.1",
+      "parent": "r3-h2"
+    },
+    {
+      "id": "r3-h2-n2",
+      "label": "Detalle 3.2.2",
+      "parent": "r3-h2"
+    },
+    {
+      "id": "r3-h3",
+      "label": "Tema 3.3",
+      "parent": "r3"
+    },
+    {
+      "id": "r3-h3-n1",
+      "label": "Detalle 3.3.1",
+      "parent": "r3-h3"
+    },
+    {
+      "id": "r3-h3-n2",
+      "label": "Detalle 3.3.2",
+      "parent": "r3-h3"
+    },
+    {
+      "id": "r4",
+      "label": "Área 4",
+      "parent": "raiz",
+      "side": "bottom"
+    },
+    {
+      "id": "r4-h1",
+      "label": "Tema 4.1",
+      "parent": "r4"
+    },
+    {
+      "id": "r4-h1-n1",
+      "label": "Detalle 4.1.1",
+      "parent": "r4-h1"
+    },
+    {
+      "id": "r4-h1-n2",
+      "label": "Detalle 4.1.2",
+      "parent": "r4-h1"
+    },
+    {
+      "id": "r4-h2",
+      "label": "Tema 4.2",
+      "parent": "r4"
+    },
+    {
+      "id": "r4-h2-n1",
+      "label": "Detalle 4.2.1",
+      "parent": "r4-h2"
+    },
+    {
+      "id": "r4-h2-n2",
+      "label": "Detalle 4.2.2",
+      "parent": "r4-h2"
+    },
+    {
+      "id": "r4-h3",
+      "label": "Tema 4.3",
+      "parent": "r4"
+    },
+    {
+      "id": "r4-h3-n1",
+      "label": "Detalle 4.3.1",
+      "parent": "r4-h3"
+    },
+    {
+      "id": "r4-h3-n2",
+      "label": "Detalle 4.3.2",
+      "parent": "r4-h3"
+    },
+    {
+      "id": "r5",
+      "label": "Área 5",
+      "parent": "raiz",
+      "side": "right"
+    },
+    {
+      "id": "r5-h1",
+      "label": "Tema 5.1",
+      "parent": "r5"
+    },
+    {
+      "id": "r5-h1-n1",
+      "label": "Detalle 5.1.1",
+      "parent": "r5-h1"
+    },
+    {
+      "id": "r5-h1-n2",
+      "label": "Detalle 5.1.2",
+      "parent": "r5-h1"
+    },
+    {
+      "id": "r5-h2",
+      "label": "Tema 5.2",
+      "parent": "r5"
+    },
+    {
+      "id": "r5-h2-n1",
+      "label": "Detalle 5.2.1",
+      "parent": "r5-h2"
+    },
+    {
+      "id": "r5-h2-n2",
+      "label": "Detalle 5.2.2",
+      "parent": "r5-h2"
+    },
+    {
+      "id": "r5-h3",
+      "label": "Tema 5.3",
+      "parent": "r5"
+    },
+    {
+      "id": "r5-h3-n1",
+      "label": "Detalle 5.3.1",
+      "parent": "r5-h3"
+    },
+    {
+      "id": "r5-h3-n2",
+      "label": "Detalle 5.3.2",
+      "parent": "r5-h3"
+    },
+    {
+      "id": "r6",
+      "label": "Área 6",
+      "parent": "raiz",
+      "side": "left"
+    },
+    {
+      "id": "r6-h1",
+      "label": "Tema 6.1",
+      "parent": "r6"
+    },
+    {
+      "id": "r6-h1-n1",
+      "label": "Detalle 6.1.1",
+      "parent": "r6-h1"
+    },
+    {
+      "id": "r6-h1-n2",
+      "label": "Detalle 6.1.2",
+      "parent": "r6-h1"
+    },
+    {
+      "id": "r6-h2",
+      "label": "Tema 6.2",
+      "parent": "r6"
+    },
+    {
+      "id": "r6-h2-n1",
+      "label": "Detalle 6.2.1",
+      "parent": "r6-h2"
+    },
+    {
+      "id": "r6-h2-n2",
+      "label": "Detalle 6.2.2",
+      "parent": "r6-h2"
+    },
+    {
+      "id": "r6-h3",
+      "label": "Tema 6.3",
+      "parent": "r6"
+    },
+    {
+      "id": "r6-h3-n1",
+      "label": "Detalle 6.3.1",
+      "parent": "r6-h3"
+    },
+    {
+      "id": "r6-h3-n2",
+      "label": "Detalle 6.3.2",
+      "parent": "r6-h3"
+    },
+    {
+      "id": "r7",
+      "label": "Área 7",
+      "parent": "raiz",
+      "side": "right"
+    },
+    {
+      "id": "r7-h1",
+      "label": "Tema 7.1",
+      "parent": "r7"
+    },
+    {
+      "id": "r7-h1-n1",
+      "label": "Detalle 7.1.1",
+      "parent": "r7-h1"
+    },
+    {
+      "id": "r7-h1-n2",
+      "label": "Detalle 7.1.2",
+      "parent": "r7-h1"
+    },
+    {
+      "id": "r7-h2",
+      "label": "Tema 7.2",
+      "parent": "r7"
+    },
+    {
+      "id": "r7-h2-n1",
+      "label": "Detalle 7.2.1",
+      "parent": "r7-h2"
+    },
+    {
+      "id": "r7-h2-n2",
+      "label": "Detalle 7.2.2",
+      "parent": "r7-h2"
+    },
+    {
+      "id": "r7-h3",
+      "label": "Tema 7.3",
+      "parent": "r7"
+    },
+    {
+      "id": "r7-h3-n1",
+      "label": "Detalle 7.3.1",
+      "parent": "r7-h3"
+    },
+    {
+      "id": "r7-h3-n2",
+      "label": "Detalle 7.3.2",
+      "parent": "r7-h3"
+    },
+    {
+      "id": "r8",
+      "label": "Área 8",
+      "parent": "raiz",
+      "side": "left"
+    },
+    {
+      "id": "r8-h1",
+      "label": "Tema 8.1",
+      "parent": "r8"
+    },
+    {
+      "id": "r8-h1-n1",
+      "label": "Detalle 8.1.1",
+      "parent": "r8-h1"
+    },
+    {
+      "id": "r8-h1-n2",
+      "label": "Detalle 8.1.2",
+      "parent": "r8-h1"
+    },
+    {
+      "id": "r8-h2",
+      "label": "Tema 8.2",
+      "parent": "r8"
+    },
+    {
+      "id": "r8-h2-n1",
+      "label": "Detalle 8.2.1",
+      "parent": "r8-h2"
+    },
+    {
+      "id": "r8-h2-n2",
+      "label": "Detalle 8.2.2",
+      "parent": "r8-h2"
+    },
+    {
+      "id": "r8-h3",
+      "label": "Tema 8.3",
+      "parent": "r8"
+    },
+    {
+      "id": "r8-h3-n1",
+      "label": "Detalle 8.3.1",
+      "parent": "r8-h3"
+    },
+    {
+      "id": "r8-h3-n2",
+      "label": "Detalle 8.3.2",
+      "parent": "r8-h3"
+    }
+  ]
+}

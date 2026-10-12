@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "type": "mindmap",
+  "title": "Plan de estudio",
+  "nodes": [
+    {
+      "id": "raiz",
+      "label": "Aprender TypeScript",
+      "parent": null
+    },
+    {
+      "id": "basicos",
+      "label": "Fundamentos",
+      "parent": "raiz"
+    },
+    {
+      "id": "tipos",
+      "label": "Tipos y genéricos",
+      "parent": "basicos"
+    },
+    {
+      "id": "practica",
+      "label": "Práctica",
+      "parent": "raiz",
+      "side": "left"
+    },
+    {
+      "id": "ejercicios",
+      "label": "Ejercicios diarios",
+      "parent": "practica"
+    },
+    {
+      "id": "proyecto",
+      "label": "Proyecto pequeño",
+      "parent": "practica"
+    },
+    {
+      "id": "recursos",
+      "label": "Recursos",
+      "parent": "raiz",
+      "side": "top"
+    }
+  ]
+}
