@@ -8,7 +8,7 @@ import {
   type Side,
 } from '@trazo/core';
 import { Position as FlowSide, getBezierPath, getSmoothStepPath } from '@xyflow/react';
-import { handlePoint, mindBranches, pickHandles } from '../../shared/geometry';
+import { OPPOSITE_SIDE, handlePoint, mindBranches, pickHandles } from '../../shared/geometry';
 import { FLOW_HEIGHT, FLOW_WIDTH, MIND_NODE, MIND_ROOT } from '../../shared/nodeSizes';
 import type { Palette } from './palette';
 
@@ -41,7 +41,6 @@ const FLOW_SIDE: Record<Side, FlowSide> = {
   bottom: FlowSide.Bottom,
   left: FlowSide.Left,
 };
-const OPPOSITE: Record<Side, Side> = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
 
 function escapeXml(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -241,16 +240,16 @@ function mindmapParts(diagram: MindmapDiagram, positions: Record<string, Positio
     if (!parent || !child) {
       return [];
     }
-    const exit: Side = sides[node.id] === 'left' ? 'left' : 'right';
+    const exit: Side = sides[node.id] ?? 'right';
     const source = handlePoint(parent.position, parent, exit);
-    const target = handlePoint(child.position, child, OPPOSITE[exit]);
+    const target = handlePoint(child.position, child, OPPOSITE_SIDE[exit]);
     const [path] = getBezierPath({
       sourceX: source.x,
       sourceY: source.y,
       sourcePosition: FLOW_SIDE[exit],
       targetX: target.x,
       targetY: target.y,
-      targetPosition: FLOW_SIDE[OPPOSITE[exit]],
+      targetPosition: FLOW_SIDE[OPPOSITE_SIDE[exit]],
     });
     const color = colorOf(branches.get(node.id)?.branch ?? '0');
     return [`<path d="${path}" fill="none" stroke="${color}" stroke-width="2.5"/>`];
